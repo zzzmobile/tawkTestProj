@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">tawkTest</string>
+
+    <string name="search">Search</string>
+    <string name="hint_search">Search&#8230;</string>
+    <string name="details">Details</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="name">Name:</string>
+    <string name="company">Company:</string>
+    <string name="blog">Blog:</string>
+    <string name="notes">Notes</string>
+    <string name="save">Save</string>
+</resources>
