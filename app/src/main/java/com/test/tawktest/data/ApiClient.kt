@@ -1,12 +1,16 @@
 package com.test.tawktest.data
 
 import com.test.tawktest.model.GitUser
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.internal.schedulers.RxThreadFactory
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 object ApiClient {
@@ -17,6 +21,7 @@ object ApiClient {
     fun build(): ServicesApiInterface? {
         var builder: Retrofit.Builder = Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
 
         var httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
@@ -38,9 +43,15 @@ object ApiClient {
 
     interface ServicesApiInterface {
         @GET("/users")
-        fun users(@Query("since") page: Int): Call<List<GitUser>>
+        fun users(@Query("since") page: Int): Observable<List<GitUser>>
 
-        @GET("/users")
-        fun user(@Query("login") login: String): Call<GitUser>
+        @GET("/users/{login}")
+        fun user(@Path("login") login: String): Observable<GitUser>
+
+        @GET("/users/{login}/followers")
+        fun followers(@Path("login") login: String): Observable<List<GitUser>>
+
+        @GET("/users/{login}/following")
+        fun followings(@Path("login") login: String): Observable<List<GitUser>>
     }
 }

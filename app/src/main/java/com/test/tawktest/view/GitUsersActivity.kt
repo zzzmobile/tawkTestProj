@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.test.tawktest.R
 import com.test.tawktest.di.Injection
 import com.test.tawktest.model.GitUser
-import com.test.tawktest.viewmodel.GitUserViewModel
+import com.test.tawktest.viewmodel.GitUserListViewModel
 import kotlinx.android.synthetic.main.activity_users.*
 
 /**
@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_users.*
  */
 class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
 
-    private lateinit var viewModel: GitUserViewModel
+    private lateinit var listViewModel: GitUserListViewModel
     private lateinit var adapter: GitUserAdapter
 
     var isLastPage: Boolean = false
@@ -40,7 +40,7 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
     private fun setupUI() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.hide()
-        adapter = GitUserAdapter(viewModel.users.value ?: emptyList(), this)
+        adapter = GitUserAdapter(listViewModel.users.value ?: emptyList(), this)
         rvUsers.layoutManager = LinearLayoutManager(this)
         rvUsers.adapter = adapter
         rvUsers.addOnScrollListener(object : PaginationScrollListener(rvUsers.layoutManager as LinearLayoutManager) {
@@ -62,15 +62,15 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
 
     // view model
     private fun setupViewModel() {
-        viewModel = ViewModelProvider(
+        listViewModel = ViewModelProvider(
             this,
             Injection.provideViewModelFactory()
-        ).get(GitUserViewModel::class.java)
+        ).get(GitUserListViewModel::class.java)
 
-        viewModel.users.observe(this, renderUsers)
-        viewModel.isViewLoading.observe(this, isViewLoadingObserver)
-        viewModel.onMessageError.observe(this, onMessageErrorObserver)
-        viewModel.isEmptyList.observe(this, emptyListObserver)
+        listViewModel.users.observe(this, renderUsers)
+        listViewModel.isViewLoading.observe(this, isViewLoadingObserver)
+        listViewModel.onMessageError.observe(this, onMessageErrorObserver)
+        listViewModel.isEmptyList.observe(this, emptyListObserver)
     }
 
     //observers
@@ -104,8 +104,8 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
     override fun onResume() {
         super.onResume()
         currentPage = 0
-        viewModel.clearUsers()
-        viewModel.loadGitUsers(0)
+        listViewModel.clearUsers()
+        listViewModel.loadGitUsers(0)
     }
 
     companion object {
@@ -114,10 +114,10 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
 
     // load users from github
     fun loadMoreUsers() {
-        val user = viewModel.users.value?.last() as GitUser
+        val user = listViewModel.users.value?.last() as GitUser
         currentPage = user.id
         isLoading = false
-        viewModel.loadGitUsers(currentPage)
+        listViewModel.loadGitUsers(currentPage)
     }
 
     override fun onUserItemClick(user: GitUser) {

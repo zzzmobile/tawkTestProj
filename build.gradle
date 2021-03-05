@@ -28,9 +28,10 @@ task clean(type: Delete) {
 ext {
     archLifecycleVersion = '2.2.0'
     gsonVersion='2.8.0'
-    retrofit2='2.3.0'
+    retrofit2='2.9.0'
     gson='2.3.0'
     okhttp3='3.4.1'
     glideVersion='4.9.0'
     circularImageViewVersion = '3.1.0'
+    roomVersion = "2.2.6"
 }

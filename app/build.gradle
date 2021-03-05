@@ -49,11 +49,15 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-compiler:$archLifecycleVersion"
 
     implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofit2"
+    implementation "com.squareup.retrofit2:adapter-rxjava3:$rootProject.retrofit2"
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.gson"
     implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okhttp3"
     implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
     implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
+
+    implementation "androidx.room:room-runtime:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
     implementation "de.hdodenhof:circleimageview:$rootProject.circularImageViewVersion"
 }
