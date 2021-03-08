@@ -1,9 +1,11 @@
 package com.test.tawktest.view
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -16,11 +18,16 @@ import kotlinx.android.synthetic.main.activity_user_details.*
 class UserDetailsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: GitUserViewModel
+    private lateinit var context: Context
+
     private lateinit var username: String
+    private lateinit var strNote: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_details)
+
+        context = this@UserDetailsActivity
 
         // extract username
         username = ""
@@ -41,6 +48,28 @@ class UserDetailsActivity : AppCompatActivity() {
         // title
         supportActionBar?.title = username
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // load notes
+        viewModel.getUserNote(context, username)!!.observe(this, Observer {
+
+            if (it != null) {
+                txtNotes.setText(it.note)
+            }
+        })
+
+        // save note button
+        btnSave.setOnClickListener {
+            // save notes
+            strNote = txtNotes.text.toString().trim()
+
+            if (strNote.isEmpty()) {
+                txtNotes.error = context.getString(R.string.error_input_note)
+            } else {
+                viewModel.insertData(context, username, strNote)
+                Toast.makeText(context, context.getText(R.string.success_input_note), Toast.LENGTH_SHORT).show()
+            }
+
+        }
     }
 
     // view model
@@ -81,7 +110,6 @@ class UserDetailsActivity : AppCompatActivity() {
         Log.v(GitUsersActivity.TAG, "onMessageError $it")
 //        layoutError.visibility = View.VISIBLE
 //        layoutEmpty.visibility = View.GONE
-//        textViewError.text = "Error $it"
     }
 
     override fun onResume() {

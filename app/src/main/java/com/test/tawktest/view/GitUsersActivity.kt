@@ -3,10 +3,11 @@ package com.test.tawktest.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.test.tawktest.R
@@ -27,6 +28,7 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
     var isLoading: Boolean = false
 
     var currentPage: Int = 0
+    var currentSearchText: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +42,22 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
     private fun setupUI() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.hide()
-        adapter = GitUserAdapter(listViewModel.users.value ?: emptyList(), this)
+
+        searchBar.addTextChangeListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                //SEARCH FILTER
+                currentSearchText = charSequence.toString()
+                listViewModel.searchUserWithName(currentSearchText)
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+            }
+        })
+
+        adapter = GitUserAdapter(listViewModel.searchUsers.value ?: emptyList(), this)
         rvUsers.layoutManager = LinearLayoutManager(this)
         rvUsers.adapter = adapter
         rvUsers.addOnScrollListener(object : PaginationScrollListener(rvUsers.layoutManager as LinearLayoutManager) {
@@ -67,7 +84,7 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
             Injection.provideViewModelFactory()
         ).get(GitUserListViewModel::class.java)
 
-        listViewModel.users.observe(this, renderUsers)
+        listViewModel.searchUsers.observe(this, renderUsers)
         listViewModel.isViewLoading.observe(this, isViewLoadingObserver)
         listViewModel.onMessageError.observe(this, onMessageErrorObserver)
         listViewModel.isEmptyList.observe(this, emptyListObserver)
@@ -79,6 +96,7 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
 //        layoutError.visibility = View.GONE
 //        layoutEmpty.visibility = View.GONE
         adapter.update(it)
+        listViewModel.searchUserWithName(currentSearchText)
     }
 
     private val isViewLoadingObserver = Observer<Boolean> {
@@ -91,7 +109,6 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
         Log.v(TAG, "onMessageError $it")
 //        layoutError.visibility = View.VISIBLE
 //        layoutEmpty.visibility = View.GONE
-//        textViewError.text = "Error $it"
     }
 
     private val emptyListObserver = Observer<Boolean> {

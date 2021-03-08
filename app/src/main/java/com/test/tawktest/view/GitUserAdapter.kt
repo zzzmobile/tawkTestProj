@@ -47,7 +47,7 @@ class GitUserAdapter(private var gitUsers: List<GitUser>, private val clickListe
             // set avatar image
             Glide.with(avatarView.context).load(gitUser.avatar_url).into(avatarView)
             // set avatar login
-            textViewName.text = gitUser.login.capitalize()
+            textViewName.text = gitUser.login
             itemView.setOnClickListener {
                 listener.onUserItemClick(gitUser)
             }

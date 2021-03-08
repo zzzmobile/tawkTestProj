@@ -2,6 +2,7 @@ package com.test.tawktest.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.test.tawktest.data.FetchUsersCallback
 import com.test.tawktest.model.GitUser
@@ -11,6 +12,9 @@ class GitUserListViewModel(private val listRepository: GitUserRepository) : View
 
     private val _users = MutableLiveData<List<GitUser>>().apply { value = emptyList() }
     val users: LiveData<List<GitUser>> = _users
+
+    private val _searchUsers = MutableLiveData<List<GitUser>>().apply { value = emptyList() }
+    val searchUsers: LiveData<List<GitUser>> = _searchUsers
 
     private val _isViewLoading = MutableLiveData<Boolean>()
     val isViewLoading: LiveData<Boolean> = _isViewLoading
@@ -44,4 +48,11 @@ class GitUserListViewModel(private val listRepository: GitUserRepository) : View
         listRepository.cancel()
     }
 
+    fun searchUserWithName(name: String) {
+        val searchUserList = ArrayList<GitUser>()
+        for (user in users.value!!.iterator())
+            if (user.login.toLowerCase().contains(name.toLowerCase()))
+                searchUserList.add(user)
+        _searchUsers.postValue(searchUserList)
+    }
 }

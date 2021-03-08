@@ -6,41 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".view.GitUsersActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolBar"
+    <com.mancj.materialsearchbar.MaterialSearchBar
+        android:id="@+id/searchBar"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:background="@color/purple_500"
-        android:elevation="3dp"
-        app:contentInsetEnd="0dp"
-        app:contentInsetLeft="0dp"
-        app:contentInsetRight="0dp"
-        app:contentInsetStart="0dp"
-        app:contentInsetStartWithNavigation="0dp"
-        android:padding="@dimen/padding_medium"
-        app:titleTextColor="@color/black"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/txtSearch"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:hint="@string/hint_search"
-            android:paddingStart="@dimen/padding_medium"
-            android:paddingEnd="@dimen/padding_medium"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            android:background="@drawable/bg_outline_gray"/>
-
-    </androidx.appcompat.widget.Toolbar>
+        app:mt_speechMode="false"
+        app:mt_hint="@string/hint_search"
+        app:mt_maxSuggestionsCount="5"
+        app:mt_placeholder="@string/search"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUsers"
@@ -49,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolBar"
+        app:layout_constraintTop_toBottomOf="@+id/searchBar"
         app:layout_constrainedHeight="true"
         app:layout_constraintVertical_bias="0"
         app:layout_constraintVertical_weight="1"/>

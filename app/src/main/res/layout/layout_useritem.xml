@@ -32,13 +32,14 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txtUser"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_big"
             android:layout_marginBottom="@dimen/padding_small"
             android:textColor="@color/black"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold"
+            android:inputType="text|none"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintLeft_toRightOf="@+id/ivUser"
             app:layout_constrainedWidth="true"/>

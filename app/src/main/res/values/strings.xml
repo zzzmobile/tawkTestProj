@@ -11,4 +11,6 @@
     <string name="blog">Blog:</string>
     <string name="notes">Notes</string>
     <string name="save">Save</string>
+    <string name="error_input_note">Please enter notes</string>
+    <string name="success_input_note">Your notes are saved successfully.</string>
 </resources>
