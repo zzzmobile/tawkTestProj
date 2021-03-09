@@ -13,4 +13,9 @@
     <string name="save">Save</string>
     <string name="error_input_note">Please enter notes</string>
     <string name="success_input_note">Your notes are saved successfully.</string>
+    <string name="no_users">No users found!</string>
+    <string name="error_fetch_users">Failed to fetch users</string>
+    <string name="error_fetch_user">Failed to fetch user</string>
+    <string name="network_unavailable">Your network is unavailable.</string>
+    <string name="network_connected">Your network is available now.</string>
 </resources>

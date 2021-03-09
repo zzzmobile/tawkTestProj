@@ -1,13 +1,18 @@
 package com.test.tawktest.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.test.tawktest.data.FetchUsersCallback
 import com.test.tawktest.model.GitUser
 import com.test.tawktest.model.GitUserRepository
+import com.test.tawktest.model.NoteRepository
+import com.test.tawktest.model.UserNoteTableModel
 
+/**
+ * userlist viewmodel
+ */
 class GitUserListViewModel(private val listRepository: GitUserRepository) : ViewModel() {
 
     private val _users = MutableLiveData<List<GitUser>>().apply { value = emptyList() }
@@ -15,6 +20,8 @@ class GitUserListViewModel(private val listRepository: GitUserRepository) : View
 
     private val _searchUsers = MutableLiveData<List<GitUser>>().apply { value = emptyList() }
     val searchUsers: LiveData<List<GitUser>> = _searchUsers
+
+    var liveDataNote: LiveData<List<UserNoteTableModel>>? = null
 
     private val _isViewLoading = MutableLiveData<Boolean>()
     val isViewLoading: LiveData<Boolean> = _isViewLoading
@@ -44,15 +51,23 @@ class GitUserListViewModel(private val listRepository: GitUserRepository) : View
         })
     }
 
+    // clear users
     fun clearUsers() {
-        listRepository.cancel()
+        _users.value = emptyList()
     }
 
+    // search users with login string
     fun searchUserWithName(name: String) {
         val searchUserList = ArrayList<GitUser>()
         for (user in users.value!!.iterator())
             if (user.login.toLowerCase().contains(name.toLowerCase()))
                 searchUserList.add(user)
         _searchUsers.postValue(searchUserList)
+    }
+
+    // get all users's note from Room database
+    fun getAllUserNotes(context: Context) : LiveData<List<UserNoteTableModel>>? {
+        liveDataNote = NoteRepository.getAllUserNotes(context)
+        return liveDataNote
     }
 }

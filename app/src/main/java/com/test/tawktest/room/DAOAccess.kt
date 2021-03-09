@@ -16,4 +16,7 @@ interface DAOAccess {
     @Query("SELECT * FROM Note WHERE login =:login")
     fun getUserNote(login: String?) : LiveData<UserNoteTableModel>
 
+    @Query("SELECT * FROM Note")
+    fun existUserNote() : LiveData<List<UserNoteTableModel>>
+
 }

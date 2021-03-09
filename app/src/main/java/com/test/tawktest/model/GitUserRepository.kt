@@ -8,10 +8,6 @@ class GitUserRepository(private val gitUserDataSource: GitUserDataSource) {
         gitUserDataSource.retrieveUsers(page, callback)
     }
 
-    fun cancel() {
-        gitUserDataSource.cancel()
-    }
-
     fun fetchUser(login: String, callback: FetchUserCallback<GitUser>) {
         gitUserDataSource.retrieveUser(login, callback)
     }

@@ -10,6 +10,9 @@ import com.test.tawktest.model.GitUserRepository
 import com.test.tawktest.model.NoteRepository
 import com.test.tawktest.model.UserNoteTableModel
 
+/**
+ * user viewmodel
+ */
 class GitUserViewModel(private val listRepository: GitUserRepository) : ViewModel() {
 
     private val _user = MutableLiveData<GitUser>().apply { value = null }

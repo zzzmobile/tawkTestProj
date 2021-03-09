@@ -2,8 +2,6 @@ package com.test.tawktest.data
 
 import com.test.tawktest.model.GitUser
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.internal.schedulers.RxThreadFactory
-import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -47,11 +45,5 @@ object ApiClient {
 
         @GET("/users/{login}")
         fun user(@Path("login") login: String): Observable<GitUser>
-
-        @GET("/users/{login}/followers")
-        fun followers(@Path("login") login: String): Observable<List<GitUser>>
-
-        @GET("/users/{login}/following")
-        fun followings(@Path("login") login: String): Observable<List<GitUser>>
     }
 }

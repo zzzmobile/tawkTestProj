@@ -1,25 +1,31 @@
 package com.test.tawktest.view
 
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.test.tawktest.R
 import com.test.tawktest.di.Injection
 import com.test.tawktest.model.GitUser
 import com.test.tawktest.viewmodel.GitUserListViewModel
 import kotlinx.android.synthetic.main.activity_users.*
+import kotlinx.android.synthetic.main.activity_users.progressBar
+
 
 /**
  * user list activity
  */
-class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
+class GitUsersActivity : AppCompatActivity() {
 
     private lateinit var listViewModel: GitUserListViewModel
     private lateinit var adapter: GitUserAdapter
@@ -27,15 +33,48 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
     var isLastPage: Boolean = false
     var isLoading: Boolean = false
 
-    var currentPage: Int = 0
-    var currentSearchText: String = ""
+    var currentPage: Int = 0    // last user's id in user list
+    var currentSearchText: String = ""      // search text
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_users)
 
+        // connectivity manager for checking network available
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val builder: NetworkRequest.Builder = NetworkRequest.Builder()
+        connectivityManager.registerNetworkCallback(
+            builder.build(),
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {    // network available
+                    Snackbar.make(
+                        contentView,
+                        getString(R.string.network_connected),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+
+                    runOnUiThread {
+                        onResume()
+                    }
+                }
+
+                override fun onLost(network: Network) {     // network unavailable
+                    Snackbar.make(
+                        contentView,
+                        getString(R.string.network_unavailable),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        )
+
         setupViewModel()
         setupUI()
+
+        // load users
+        currentPage = 0
+        listViewModel.clearUsers()
+        listViewModel.loadGitUsers(0)
     }
 
     // view
@@ -43,6 +82,7 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.hide()
 
+        // search bar textchange listener
         searchBar.addTextChangeListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
             }
@@ -57,10 +97,11 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
             }
         })
 
-        adapter = GitUserAdapter(listViewModel.searchUsers.value ?: emptyList(), this)
+        adapter = GitUserAdapter(listViewModel.searchUsers.value ?: emptyList(), listViewModel.liveDataNote?.value ?: emptyList())
         rvUsers.layoutManager = LinearLayoutManager(this)
         rvUsers.adapter = adapter
-        rvUsers.addOnScrollListener(object : PaginationScrollListener(rvUsers.layoutManager as LinearLayoutManager) {
+        rvUsers.addOnScrollListener(object :
+            PaginationScrollListener(rvUsers.layoutManager as LinearLayoutManager) {
             override fun isLastPage(): Boolean {
                 return isLastPage
             }
@@ -75,6 +116,13 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
                 loadMoreUsers()
             }
         })
+        // item click listener for recyclerview
+        rvUsers.addOnItemTouchListener(RecyclerTouchListener(this, object : ClickListener {
+                    override fun onClick(view: View?, position: Int) {
+                        listViewModel.searchUsers.value?.let { onUserDetails(it.get(position)) }
+                    }
+                })
+        )
     }
 
     // view model
@@ -92,52 +140,47 @@ class GitUsersActivity : AppCompatActivity(), OnUserItemClickListener {
 
     //observers
     private val renderUsers = Observer<List<GitUser>> {
-        Log.v(TAG, "data updated $it")
-//        layoutError.visibility = View.GONE
-//        layoutEmpty.visibility = View.GONE
         adapter.update(it)
         listViewModel.searchUserWithName(currentSearchText)
+        // load notes
+        listViewModel.getAllUserNotes(this)!!.observe(this, Observer { notes ->
+            adapter.updateNotes(notes)
+        })
     }
 
     private val isViewLoadingObserver = Observer<Boolean> {
-        Log.v(TAG, "isViewLoading $it")
         val visibility = if (it) View.VISIBLE else View.GONE
         progressBar.visibility = visibility
     }
 
     private val onMessageErrorObserver = Observer<Any> {
-        Log.v(TAG, "onMessageError $it")
-//        layoutError.visibility = View.VISIBLE
-//        layoutEmpty.visibility = View.GONE
+        Snackbar.make(
+            contentView,
+            getString(R.string.error_fetch_users),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     private val emptyListObserver = Observer<Boolean> {
-        Log.v(TAG, "emptyListObserver $it")
-//        layoutEmpty.visibility = View.VISIBLE
-//        layoutError.visibility = View.GONE
-    }
-
-    //If you require updated data, you can call the method "loadGitUsers" here
-    override fun onResume() {
-        super.onResume()
-        currentPage = 0
-        listViewModel.clearUsers()
-        listViewModel.loadGitUsers(0)
-    }
-
-    companion object {
-        const val TAG = "CONSOLE"
+        Snackbar.make(
+            contentView,
+            getString(R.string.no_users),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     // load users from github
     fun loadMoreUsers() {
+        if (listViewModel.users.value.isNullOrEmpty())
+            return
+
         val user = listViewModel.users.value?.last() as GitUser
         currentPage = user.id
         isLoading = false
         listViewModel.loadGitUsers(currentPage)
     }
 
-    override fun onUserItemClick(user: GitUser) {
+    fun onUserDetails(user: GitUser) {
         // show user details activity
         val intent = Intent(this, UserDetailsActivity::class.java)
         intent.putExtra("username", user.login)

@@ -2,15 +2,16 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/itemView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="10dp"
     app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/background"
     android:layout_marginStart="@dimen/padding_medium"
     android:layout_marginEnd="@dimen/padding_medium"
     android:layout_marginTop="@dimen/padding_small"
-    android:layout_marginBottom="@dimen/padding_small">
+    android:layout_marginBottom="@dimen/padding_small"
+    android:clickable="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -63,6 +64,16 @@
             android:id="@+id/guideline"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.5"/>
+
+        <ImageView
+            android:id="@+id/imgNoteMark"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_note"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

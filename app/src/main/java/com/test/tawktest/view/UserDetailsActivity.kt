@@ -3,17 +3,18 @@ package com.test.tawktest.view
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
 import com.test.tawktest.R
 import com.test.tawktest.di.Injection
 import com.test.tawktest.model.GitUser
 import com.test.tawktest.viewmodel.GitUserViewModel
 import kotlinx.android.synthetic.main.activity_user_details.*
+import kotlinx.android.synthetic.main.activity_user_details.progressBar
+import kotlinx.android.synthetic.main.activity_users.*
 
 class UserDetailsActivity : AppCompatActivity() {
 
@@ -66,9 +67,12 @@ class UserDetailsActivity : AppCompatActivity() {
                 txtNotes.error = context.getString(R.string.error_input_note)
             } else {
                 viewModel.insertData(context, username, strNote)
-                Toast.makeText(context, context.getText(R.string.success_input_note), Toast.LENGTH_SHORT).show()
+                Snackbar.make(
+                    contentView,
+                    context.getText(R.string.success_input_note),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
-
         }
     }
 
@@ -86,34 +90,39 @@ class UserDetailsActivity : AppCompatActivity() {
 
     //observers
     private val renderUser = Observer<GitUser> {
-        Log.v(GitUsersActivity.TAG, "data updated $it")
-//        layoutError.visibility = View.GONE
-//        layoutEmpty.visibility = View.GONE
         if (it != null) {
-            Glide.with(ivUser.context).load(it.avatar_url).into(ivUser)
+            // set user avatar image
+            Picasso.get().load(it.avatar_url).into(ivUser)
+            // set user name
             txtName.text = it.name
+            // set user company
             txtCompany.text = it.company
+            // set user blog
             txtBlog.text = it.blog
 
+            // followers count
             txtFollowers.text = it.followers.toString()
+            // following count
             txtFollowing.text = it.following.toString()
         }
     }
 
     private val isViewLoadingObserver = Observer<Boolean> {
-        Log.v(GitUsersActivity.TAG, "isViewLoading $it")
         val visibility = if (it) View.VISIBLE else View.GONE
         progressBar.visibility = visibility
     }
 
     private val onMessageErrorObserver = Observer<Any> {
-        Log.v(GitUsersActivity.TAG, "onMessageError $it")
-//        layoutError.visibility = View.VISIBLE
-//        layoutEmpty.visibility = View.GONE
+        Snackbar.make(
+            contentView,
+            getString(R.string.error_fetch_user),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     override fun onResume() {
         super.onResume()
+        // load current user details
         viewModel.loadGitUser(username)
     }
 

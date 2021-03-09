@@ -32,5 +32,11 @@ class NoteRepository {
             noteTableModel = noteDatabase!!.noteDao().getUserNote(login)
             return noteTableModel
         }
+
+        // get all user note
+        fun getAllUserNotes(context: Context) : LiveData<List<UserNoteTableModel>>? {
+            noteDatabase = initializeDB(context)
+            return noteDatabase!!.noteDao().existUserNote()
+        }
     }
 }
