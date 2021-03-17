@@ -68,7 +68,7 @@ class UserDetailsActivity : AppCompatActivity() {
             } else {
                 viewModel.insertData(context, username, strNote)
                 Snackbar.make(
-                    contentView,
+                    it,
                     context.getText(R.string.success_input_note),
                     Snackbar.LENGTH_SHORT
                 ).show()
